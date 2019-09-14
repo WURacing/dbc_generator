@@ -1,0 +1,13 @@
+ [info]
+name = "dbc_generator"
+version = "0.0.1"
+description = ""
+
+[deployment]
+type = "PORT"
+dest = 9000
+scripts = ['make install']
+artifact_folder = ""
+
+[config]
+dummy_var = 'dummy'

@@ -1,2 +1,2 @@
-# dbc_generator
+# DBC Generator
 DBC Generation Server
