@@ -9,17 +9,20 @@ class DBC:
     """
     Add packet to dbc
     """
+
     def add_packet(self, packet):
         pass
 
     """
     Determine if this is a valid dbc
     """
+
     def is_valid(self):
         pass
 
     """
     Custom string representation
     """
+
     def __repr__(self):
         pass

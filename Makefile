@@ -5,7 +5,7 @@ install:
 
 .PHONY: test
 test:
-	Make is not configured to run any tests
+	pytest test_packet.py
 
 .PHONY: run
 run:

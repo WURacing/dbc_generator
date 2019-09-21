@@ -4,33 +4,34 @@ from pathlib import Path
 import logging
 
 
-CONFIG_PATH = f'{Path(__file__).parent}/../agent_config.toml'
+CONFIG_PATH = f"{Path(__file__).parent}/../agent_config.toml"
 LOG = logging.getLogger("dbc_generator.server")
 
 # find deployment port
 try:
     CONFIG = toml.load(CONFIG_PATH)
-    PORT = CONFIG['deployment']['dest']
+    PORT = CONFIG["deployment"]["dest"]
 except FileNotFoundError:
-    LOG.error(f'count not find file with path {CONFIG_PATH}')
+    LOG.error(f"count not find file with path {CONFIG_PATH}")
     raise SystemExit
 
 if PORT is None or CONFIG is None:
-    raise SystemExit('Failed to load required resources from agent_config')
+    raise SystemExit("Failed to load required resources from agent_config")
 
 # establish bottle app
 app = Bottle()
 
 
-@app.get('/')
+@app.get("/")
 def root():
-    return 'welcome to dbc generator'
+    return "welcome to dbc generator"
 
 
 # TODO: add file server route for UI
-@app.get('/ui')
+@app.get("/ui")
 def ui():
     return static_file("ui.html", "static/ui/")
+
 
 @app.get("/static/<path>/<filename>")
 def static(path, filename):
@@ -38,11 +39,10 @@ def static(path, filename):
 
 
 # TODO: add POST route for generating the file
-@app.post('/upload')
+@app.post("/upload")
 def upload():
     for thing in request.forms:
         print(thing)
 
 
-
-run(app, host='localhost', port=PORT, debug=True)
+run(app, host="localhost", port=PORT, debug=True)
