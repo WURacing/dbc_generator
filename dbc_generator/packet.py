@@ -1,6 +1,8 @@
+from dbc_generator.signal import Signal
+
 class Packet:
-    def __init__(self, name, id, bus_id, length):
-        self.signals = []  # signal list
+    def __init__(self, name, id, bus_id, length, signals = None):
+        self.signals = [] if signals is None else signals  # signal list
         self.name = name
         self.id = id
         self.bus_id = bus_id
@@ -17,6 +19,19 @@ class Packet:
         Determine if this is a valid packet
         """
         pass
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        nane = data["name"]
+        self.id = data["id"]
+        self.bus_id = data["bus_id"]
+        self.length = data["length"]
+        signals = []
+        for signal in data["signals"]:
+            signals.append(Signal.from_dict(signal))
+        
+        return cls(name=data["name"], id=data["id"], bus_id=data["bus_id"], length=data["length"], signals=signals)
+        
 
     def __repr__(self):
         """

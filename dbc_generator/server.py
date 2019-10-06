@@ -27,7 +27,6 @@ def root():
     return "welcome to dbc generator"
 
 
-# TODO: add file server route for UI
 @app.get("/ui")
 def ui():
     return static_file("ui.html", "static/ui/")
@@ -38,7 +37,6 @@ def static(path, filename):
     return static_file(filename, "static/" + path)
 
 
-# TODO: add POST route for generating the file
 @app.post("/upload")
 def upload():
     for thing in request.forms:

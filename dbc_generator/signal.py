@@ -13,6 +13,11 @@ class Signal:
     units: str
     sender: str = "Vector__XXX"
 
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(**data)
+
+
     def __repr__(self):
         """
         Custom string representation

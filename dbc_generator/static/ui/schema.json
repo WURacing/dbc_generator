@@ -1,0 +1,64 @@
+{
+    "packet": [
+        {
+            "name": "name",
+            "display": "Name"
+        },
+        {
+            "name": "id",
+            "display": "ID"
+        },
+        {
+            "name": "bus_id",
+            "display": "Bus ID"
+        },
+        {
+            "name": "length",
+            "display": "Length"
+        },
+        {
+            "name": "signals",
+            "ref": "signal",
+            "display": "Signals"
+        }
+    ],
+    "signal": [
+        {
+            "name": "name",
+            "display": "Name"
+        },
+        {
+            "name": "pos_start",
+            "display": "Start Position"
+        },
+        {
+            "name": "pos_end",
+            "display": "End Position"
+        },
+        {
+            "name": "scale",
+            "display": "Scale"
+        },
+        {
+            "name": "offset",
+            "display": "Offset"
+        },
+        {
+            "name": "min",
+            "display": "Minimum Value"
+        },
+        {
+            "name": "max",
+            "display": "Maximum Value"
+        },
+        {
+            "name": "units",
+            "display": "Units"
+        },
+        {
+            "name": "sender",
+            "display": "Sender",
+            "default": "Vector__XXX"
+        }
+    ]
+}
