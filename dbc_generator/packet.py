@@ -1,4 +1,4 @@
-from dbc_generator.signal import Signal
+from signal import Signal
 
 class Packet:
     def __init__(self, name, id, bus_id, length, signals = None):
@@ -23,9 +23,6 @@ class Packet:
     @classmethod
     def from_dict(cls, data: dict):
         nane = data["name"]
-        self.id = data["id"]
-        self.bus_id = data["bus_id"]
-        self.length = data["length"]
         signals = []
         for signal in data["signals"]:
             signals.append(Signal.from_dict(signal))

@@ -8,16 +8,55 @@ window.onload = function() {
     .then(response => response.json())
     .then(response => {
         schema = response;
-        addFields(schema.packet, document.getElementById("fields"), "packet");
+        // addFields(schema.file, document.getElementById("fields"), "file", inputs);
+        inputs = [];
+        this.createFields(schema.file, inputs, document.getElementById("fields"));
+        
     });
 }
 
-function addFields(fields, parent, name) {
+function addFields(fields, parent, name, inputDict) {
     let container = document.createElement("div");
     container.classList.add("container");
     let inputFields = [];
     for(let field of fields) {
         if(field.ref == undefined) {
+            // create text input field
+            let defaultText = field.default != undefined ? field.default : "";
+            let textField = textInput(field.name, field.display, defaultText);
+            inputFields.push(textField);
+            container.appendChild(textField);
+        } else {
+            // create nested input value
+            let button = document.createElement("button");
+            button.innerHTML = field.display;
+            let subcontainer = document.createElement("div");
+            button.onclick = () => {
+                let subInputs = {}
+                addFields(schema[field.ref], subcontainer, field.ref, subInputs);
+                if(!inputFields[field.ref]) {
+                    inputFields[field.ref] = [];
+                }
+                inputFields[field.ref].push(subInputs);
+            }
+            container.appendChild(button);
+            container.appendChild(subcontainer);
+        }
+    }
+    if(!inputDict[name]) {
+        inputDict[name] = [];
+    }
+    inputDict[name] = (inputFields);
+    parent.appendChild(container);
+}
+
+function createFields(fieldList, inputList, parentContainer) {
+    let container = document.createElement("div");
+    container.classList.add("container");
+    let inputFields = [];
+    for(let field of fieldList) {
+        if(field.ref == undefined) {
+            // create text input field
             let defaultText = field.default != undefined ? field.default : "";
             let textField = textInput(field.name, field.display, defaultText);
             inputFields.push(textField);
@@ -25,19 +64,22 @@ function addFields(fields, parent, name) {
         } else {
             let button = document.createElement("button");
             button.innerHTML = field.display;
-            let subcontainer = document.createElement("div");
             button.onclick = () => {
-                addFields(schema[field.ref], subcontainer, field.ref);
+                let subInputs = [];
+                createFields(schema[field.ref], subInputs, container);
+                // if(inputList[field.ref] == undefined) {
+                //     inputList[field.ref] = [];
+                // }
+                inputFields.push(subInputs[0]);
+                // inputList[field.ref].push(subInputs);
             }
             container.appendChild(button);
-            container.appendChild(subcontainer);
         }
     }
-    if(!inputs[name]) {
-        inputs[name] = [];
-    }
-    inputs[name].push(inputFields);
-    parent.appendChild(container);
+    inputList.push(inputFields);
+    
+    parentContainer.appendChild(container);
+
 }
 
 function textInput(id, placeholder, value = "") {
@@ -52,16 +94,28 @@ function textInput(id, placeholder, value = "") {
 }
 
 function post() {
-
-    for(key of Object.keys(inputs)) {
-        for(input of inputs[key]) {
-            // TODO: collect inputs into JSON object
+    let data = {file: []};
+    for(let packet of inputs[0]) {
+        let packetData = {signals: []};
+        for(let value of packet) {
+            if(value instanceof Array) {
+                let signalData = {};
+                for(let j = 0; j < schema.signal.length; j++) {
+                    signalData[schema.signal[j].name] = value[j].value;
+                }
+                packetData.signals.push(signalData);
+            } else {
+                packetData[value.name] = value.value;
+            }
         }
+        data.file.push(packetData);
     }
+
+    console.log(data);
 
     fetch("upload", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(vals)
+        body: JSON.stringify(data)
     }).then(response => response.text()).then(console.log);
 }

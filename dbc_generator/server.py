@@ -1,7 +1,10 @@
 from bottle import Bottle, run, get, post, request, template, static_file
 import toml
 from pathlib import Path
+from packet import Packet
+import json
 import logging
+
 
 
 CONFIG_PATH = f"{Path(__file__).parent}/../agent_config.toml"
@@ -40,7 +43,10 @@ def static(path, filename):
 @app.post("/upload")
 def upload():
     for thing in request.forms:
-        print(thing)
+
+        data = json.loads(thing)
+        for packet in data["file"]:
+            print(Packet.from_dict(packet))
 
 
 run(app, host="localhost", port=PORT, debug=True)

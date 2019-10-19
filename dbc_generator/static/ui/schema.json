@@ -1,25 +1,33 @@
 {
+    "file": [
+        {
+            "name": "packets",
+            "ref": "packet",
+            "display": "Add Packet"
+        }
+    ],
     "packet": [
+        {
+            "name": "id",
+            "display": "ID"
+        },
         {
             "name": "name",
             "display": "Name"
         },
         {
-            "name": "id",
-            "display": "ID"
+            "name": "length",
+            "display": "Length",
+            "default": 8
         },
         {
             "name": "bus_id",
             "display": "Bus ID"
         },
         {
-            "name": "length",
-            "display": "Length"
-        },
-        {
             "name": "signals",
             "ref": "signal",
-            "display": "Signals"
+            "display": "Add Signal"
         }
     ],
     "signal": [
