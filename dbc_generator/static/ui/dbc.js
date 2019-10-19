@@ -1,6 +1,6 @@
 let form;
 let schema;
-let inputs = {};
+let inputs = [];
 
 window.onload = function() {
     form = this.document.getElementById("submission-form");
@@ -8,46 +8,9 @@ window.onload = function() {
     .then(response => response.json())
     .then(response => {
         schema = response;
-        // addFields(schema.file, document.getElementById("fields"), "file", inputs);
-        inputs = [];
         this.createFields(schema.file, inputs, document.getElementById("fields"));
         
     });
-}
-
-function addFields(fields, parent, name, inputDict) {
-    let container = document.createElement("div");
-    container.classList.add("container");
-    let inputFields = [];
-    for(let field of fields) {
-        if(field.ref == undefined) {
-            // create text input field
-            let defaultText = field.default != undefined ? field.default : "";
-            let textField = textInput(field.name, field.display, defaultText);
-            inputFields.push(textField);
-            container.appendChild(textField);
-        } else {
-            // create nested input value
-            let button = document.createElement("button");
-            button.innerHTML = field.display;
-            let subcontainer = document.createElement("div");
-            button.onclick = () => {
-                let subInputs = {}
-                addFields(schema[field.ref], subcontainer, field.ref, subInputs);
-                if(!inputFields[field.ref]) {
-                    inputFields[field.ref] = [];
-                }
-                inputFields[field.ref].push(subInputs);
-            }
-            container.appendChild(button);
-            container.appendChild(subcontainer);
-        }
-    }
-    if(!inputDict[name]) {
-        inputDict[name] = [];
-    }
-    inputDict[name] = (inputFields);
-    parent.appendChild(container);
 }
 
 function createFields(fieldList, inputList, parentContainer) {
