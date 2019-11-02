@@ -17,6 +17,18 @@ class Signal:
     def from_dict(cls, data: dict):
         return cls(**data)
 
+    @classmethod
+    def from_signal(cls, signal):
+        return cls(
+            name=signal.name,
+            pos_start=signal.start,
+            pos_end=signal.length,
+            scale=signal.scale,
+            offset=signal.offset,
+            min=signal.minimum,
+            max=signal.maximum,
+            units=signal.unit,
+        )
 
     def __repr__(self):
         """

@@ -29,6 +29,11 @@ class Packet:
         
         return cls(name=data["name"], id=data["id"], bus_id=data["bus_id"], length=data["length"], signals=signals)
         
+    @classmethod
+    def from_message(cls, message, signals):
+        frame_id = message.frame_id | 0x80000000 if message.is_extended_frame else message.frame_id
+        return cls(name=message.name, id=frame_id, bus_id=message.senders[0], length=message.length, signals=signals)
+
 
     def __repr__(self):
         """

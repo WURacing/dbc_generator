@@ -12,6 +12,7 @@ class DBC:
             return
 
         self.packets = []  # packet list
+        self.bus_ids = set()
         if filepath is not None:
             pass
 
@@ -30,14 +31,15 @@ class DBC:
         """
         Add packet to dbc
         """
-        pass
+        self.bus_ids.add(packet.bus_id)
+        self.packets.add(packet)
 
     
     def is_valid(self):
         """
         Determine if this is a valid dbc
         """
-        pass
+        pass # we don't have invalid dbcs. duh
 
 
     def __repr__(self):
