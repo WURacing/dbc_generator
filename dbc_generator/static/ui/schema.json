@@ -41,7 +41,7 @@
         },
         {
             "name": "pos_end",
-            "display": "End Position"
+            "display": "Length"
         },
         {
             "name": "scale",

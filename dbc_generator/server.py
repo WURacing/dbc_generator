@@ -1,7 +1,7 @@
 from bottle import Bottle, run, get, post, request, template, static_file
 import toml
 from pathlib import Path
-from packet import Packet
+from dbc import DBC
 import json
 import logging
 
@@ -45,8 +45,7 @@ def upload():
     for thing in request.forms:
 
         data = json.loads(thing)
-        for packet in data["file"]:
-            print(Packet.from_dict(packet))
-
+        dbc = DBC.from_packets_list(data["file"])
+        print(dbc)
 
 run(app, host="localhost", port=PORT, debug=True)
