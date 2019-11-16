@@ -21,12 +21,14 @@ window.onload = function() {
             select.appendChild(option);
         }
     });
+    // let fields = document.getElementById("fields");
+    // console.log(getDataFromContainer(fields));
 }
 
 /**
  * Creates the fields for the schema object
  * @param {Object} fieldList 
- * @param {HTMLInputField[]} inputList 
+ * @param {HTMLInputElement[]} inputList 
  * @param {HTMLDivElement} parentContainer 
  */
 function createFields(fieldList, inputList, parentContainer) {
@@ -76,22 +78,23 @@ function textInput(id, placeholder, value = "") {
  * Sends data to the backend
  */
 function post() {
-    let data = {file: []};
-    for(let packet of inputs[0]) {
-        let packetData = {signals: []};
-        for(let value of packet) {
-            if(value instanceof Array) {
-                let signalData = {};
-                for(let j = 0; j < schema.signals.length; j++) {
-                    signalData[schema.signals[j].name] = value[j].value;
-                }
-                packetData.signals.push(signalData);
-            } else {
-                packetData[value.name] = value.value;
-            }
-        }
-        data.file.push(packetData);
-    }
+    // let data = {file: []};
+    // for(let packet of inputs[0]) {
+    //     let packetData = {signals: []};
+    //     for(let value of packet) {
+    //         if(value instanceof Array) {
+    //             let signalData = {};
+    //             for(let j = 0; j < schema.signals.length; j++) {
+    //                 signalData[schema.signals[j].name] = value[j].value;
+    //             }
+    //             packetData.signals.push(signalData);
+    //         } else {
+    //             packetData[value.name] = value.value;
+    //         }
+    //     }
+    //     data.file.push(packetData);
+    // }
+    let data = extractData();
 
     fetch("upload", {
         method: "POST",
@@ -108,11 +111,12 @@ function post() {
  */
 function importFields(data, key, parentContainer) {
     let schemaData = schema[key];
-    console.log(data);
+
     for(let entry of data) {
         let container = document.createElement("div");
         container.classList.add("container");
-        console.log(entry);
+        container.id = key;
+
         for(let field of schemaData) {
             if(field.ref == undefined) {
                 // create text input field
@@ -129,12 +133,33 @@ function importFields(data, key, parentContainer) {
                     inputFields.push(subInputs[0]);
                 }
                 container.appendChild(button);
-                console.log(field.ref, entry);
+
                 importFields(entry[field.ref], field.ref, container);
             }
         }
         parentContainer.appendChild(container);
     }
+}
+
+function extractData() {
+    let fields = document.getElementById("fields");
+    return getDataFromContainer(fields)[""][0];
+}
+
+function getDataFromContainer(container) {
+    let data = {};
+    for(let element of container.children) {
+        if(element instanceof HTMLDivElement) {
+            if(!data[element.id]) {
+                data[element.id] = [];
+            }
+            data[element.id].push(getDataFromContainer(element));
+        } else if(element instanceof HTMLInputElement) {
+            // console.log(element.name)
+            data[element.name] = element.value;
+        }
+    }
+    return data;
 }
 
 /**

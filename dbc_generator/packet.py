@@ -24,7 +24,6 @@ class Packet:
 
     @classmethod
     def from_dict(cls, data: dict):
-        nane = data["name"]
         signals = []
         for signal in data["signals"]:
             signals.append(Signal.from_dict(signal))

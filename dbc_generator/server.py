@@ -68,9 +68,8 @@ def static(path, filename):
 @app.post("/upload")
 def upload():
     for thing in request.forms:
-
         data = json.loads(thing)
-        dbc = DBC.from_packets_list(data["file"])
+        dbc = DBC.from_packets_list(data["file"][0]["packet"])
         print(dbc)
 
 
