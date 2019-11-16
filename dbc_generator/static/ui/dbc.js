@@ -1,9 +1,7 @@
-let form;
 let schema;
 let inputs = [];
 
 window.onload = function() {
-    form = this.document.getElementById("submission-form");
     fetch("/static/ui/schema.json")
     .then(response => response.json())
     .then(response => {
@@ -25,6 +23,12 @@ window.onload = function() {
     });
 }
 
+/**
+ * Creates the fields for the schema object
+ * @param {Object} fieldList 
+ * @param {HTMLInputField[]} inputList 
+ * @param {HTMLDivElement} parentContainer 
+ */
 function createFields(fieldList, inputList, parentContainer) {
     let container = document.createElement("div");
     container.classList.add("container");
@@ -42,21 +46,21 @@ function createFields(fieldList, inputList, parentContainer) {
             button.onclick = () => {
                 let subInputs = [];
                 createFields(schema[field.ref], subInputs, container);
-                // if(inputList[field.ref] == undefined) {
-                //     inputList[field.ref] = [];
-                // }
                 inputFields.push(subInputs[0]);
-                // inputList[field.ref].push(subInputs);
             }
             container.appendChild(button);
         }
     }
     inputList.push(inputFields);
-    
     parentContainer.appendChild(container);
-
 }
-
+/**
+ * Creates a text input field
+ * @param {string} id
+ * @param {string} placeholder 
+ * @param {string?} value 
+ * @returns The text field DOM element
+ */
 function textInput(id, placeholder, value = "") {
     let input = document.createElement("input");
     input.type = "text";
@@ -68,6 +72,9 @@ function textInput(id, placeholder, value = "") {
     return input;
 }
 
+/**
+ * Sends data to the backend
+ */
 function post() {
     let data = {file: []};
     for(let packet of inputs[0]) {
@@ -93,6 +100,12 @@ function post() {
     }).then(response => response.text()).then(console.log);
 }
 
+/**
+ * Imports data into fields from a JSON response
+ * @param {Object} data 
+ * @param {string} key 
+ * @param {HTMLDivElement} parentContainer 
+ */
 function importFields(data, key, parentContainer) {
     let schemaData = schema[key];
     console.log(data);
@@ -124,6 +137,9 @@ function importFields(data, key, parentContainer) {
     }
 }
 
+/**
+ * Loads the selected DBC file from github
+ */
 async function loadSelectedFile() {
     let selector = document.getElementById("select-dbc");
     let url = selector.options[selector.selectedIndex].value;
