@@ -1,7 +1,7 @@
 {
     "file": [
         {
-            "name": "packets",
+            "name": "packet",
             "ref": "packet",
             "display": "Add Packet"
         }
@@ -26,11 +26,11 @@
         },
         {
             "name": "signals",
-            "ref": "signal",
+            "ref": "signals",
             "display": "Add Signal"
         }
     ],
-    "signal": [
+    "signals": [
         {
             "name": "name",
             "display": "Name"

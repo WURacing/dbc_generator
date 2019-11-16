@@ -1,4 +1,6 @@
+from dataclasses import asdict
 from packet import Packet
+
 
 class DBC:
 
@@ -25,8 +27,14 @@ class DBC:
 
         return cls(packets=packets)
 
+    def to_dict(self):
+        data = {"packet": []}
 
-    
+        for packet in self.packets:
+            data["packet"].append(asdict(packet))
+
+        return {"file": [data]}
+
     def add_packet(self, packet):
         """
         Add packet to dbc
@@ -34,13 +42,11 @@ class DBC:
         self.bus_ids.add(packet.bus_id)
         self.packets.add(packet)
 
-    
     def is_valid(self):
         """
         Determine if this is a valid dbc
         """
-        pass # we don't have invalid dbcs. duh
-
+        pass  # we don't have invalid dbcs. duh
 
     def __repr__(self):
         """
@@ -128,4 +134,6 @@ BA_ "GenMsgCycleTime" BO_ 2180030466 16;
 BA_ "GenMsgCycleTime" BO_ 2180030465 16;
 BA_ "GenMsgCycleTime" BO_ 2180030464 16;
 
-""".format(bus_ids=" ".join(self.bus_ids), packets="\n\n".join(packet_strs))
+""".format(
+            bus_ids=" ".join(self.bus_ids), packets="\n\n".join(packet_strs)
+        )

@@ -3,6 +3,7 @@ from signal import Signal
 from dbc import DBC
 from packet import Packet
 
+
 def parse(data: str):
     model = cantools.database.load_string(data)
     packets = []
@@ -12,5 +13,10 @@ def parse(data: str):
             signals.append(Signal.from_signal(signal))
         packet = Packet.from_message(message, signals)
         packets.append(packet)
-    
+
     return DBC(packets=packets)
+
+
+if __name__ == "__main__":
+    text = open("2019.1.0.dbc").read()
+    print(parse(text))

@@ -7,6 +7,10 @@
     </head>
     <body>
         <h1>DBC Generator</h1>
+        <select id="select-dbc">
+            <option value="null">Select a DBC file to load...</option>
+        </select>
+        <button onclick="loadSelectedFile()">Load DBC file</button>
         <button onclick="post()">Send Data</button>
         <div id="fields"></div>
     </body>

@@ -11,6 +11,18 @@ window.onload = function() {
         this.createFields(schema.file, inputs, document.getElementById("fields"));
         
     });
+
+    fetch("/dbcs")
+    .then(response => response.json())
+    .then(response => {
+        let select = this.document.getElementById("select-dbc");
+        for(let file of response) {
+            let option = document.createElement("option");
+            option.text = file.name;
+            option.value = file.download;
+            select.appendChild(option);
+        }
+    });
 }
 
 function createFields(fieldList, inputList, parentContainer) {
@@ -63,8 +75,8 @@ function post() {
         for(let value of packet) {
             if(value instanceof Array) {
                 let signalData = {};
-                for(let j = 0; j < schema.signal.length; j++) {
-                    signalData[schema.signal[j].name] = value[j].value;
+                for(let j = 0; j < schema.signals.length; j++) {
+                    signalData[schema.signals[j].name] = value[j].value;
                 }
                 packetData.signals.push(signalData);
             } else {
@@ -74,11 +86,60 @@ function post() {
         data.file.push(packetData);
     }
 
-    console.log(data);
-
     fetch("upload", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(data)
     }).then(response => response.text()).then(console.log);
+}
+
+function importFields(data, key, parentContainer) {
+    let schemaData = schema[key];
+    console.log(data);
+    for(let entry of data) {
+        let container = document.createElement("div");
+        container.classList.add("container");
+        console.log(entry);
+        for(let field of schemaData) {
+            if(field.ref == undefined) {
+                // create text input field
+                let defaultText = entry[field.name];
+                let textField = textInput(field.name, field.display, defaultText);
+                // inputFields.push(textField);
+                container.appendChild(textField);
+            } else {
+                let button = document.createElement("button");
+                button.innerHTML = field.display;
+                button.onclick = () => {
+                    let subInputs = [];
+                    createFields(schema[field.ref], subInputs, container);
+                    inputFields.push(subInputs[0]);
+                }
+                container.appendChild(button);
+                console.log(field.ref, entry);
+                importFields(entry[field.ref], field.ref, container);
+            }
+        }
+        parentContainer.appendChild(container);
+    }
+}
+
+async function loadSelectedFile() {
+    let selector = document.getElementById("select-dbc");
+    let url = selector.options[selector.selectedIndex].value;
+    if(url == "null") {
+        return;
+    }
+    console.log(url);
+    let response = await fetch("/parse", {
+        method: "POST",
+        body: url
+    });
+    let data = await response.json();
+    let container = document.createElement("div");
+    container.classList.add("container");
+    importFields(data.file, "file", container);
+    let parentContainer = document.getElementById("fields");
+    parentContainer.innerHTML = "";
+    parentContainer.appendChild(container);
 }

@@ -2,3 +2,4 @@ Bottle
 toml
 pytest
 cantools
+requests
