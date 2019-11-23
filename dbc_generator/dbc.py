@@ -5,10 +5,11 @@ from packet import Packet
 class DBC:
 
     # if provided filepath, load DBC tree structure from path
-    def __init__(self, filepath=None, packets=None):
+    def __init__(self, filepath=None, packets=None, ecu_packets=None):
         if packets is not None:
             self.packets = packets
             self.bus_ids = set()
+            self.ecu_packets = ecu_packets
             for packet in packets:
                 self.bus_ids.add(packet.bus_id)
             return
@@ -19,13 +20,13 @@ class DBC:
             pass
 
     @classmethod
-    def from_packets_list(cls, packets_data: list) -> "DBC":
+    def from_packets_list(cls, packets_data: list, ecu_packets: str) -> "DBC":
         packets = []
         for data in packets_data:
             packet = Packet.from_dict(data)
             packets.append(packet)
 
-        return cls(packets=packets)
+        return cls(packets=packets, ecu_packets=ecu_packets)
 
     def to_dict(self):
         data = {"packet": []}
@@ -95,6 +96,7 @@ BU_: {bus_ids}
 
 {packets}
 
+{ecu_packets}
 
 
 BA_DEF_ BU_  "TpNodeBaseAddress" HEX 0 65535;
@@ -135,5 +137,5 @@ BA_ "GenMsgCycleTime" BO_ 2180030465 16;
 BA_ "GenMsgCycleTime" BO_ 2180030464 16;
 
 """.format(
-            bus_ids=" ".join(self.bus_ids), packets="\n\n".join(packet_strs)
+            bus_ids=" ".join(self.bus_ids), packets="\n\n".join(packet_strs), ecu_packets=self.ecu_packets
         )

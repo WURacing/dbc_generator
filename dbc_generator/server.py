@@ -10,11 +10,13 @@ import logging
 
 CONFIG_PATH = f"{Path(__file__).parent}/../agent_config.toml"
 LOG = logging.getLogger("dbc_generator.server")
+ECU_CONFIGS = {}
 
 # find deployment port
 try:
     CONFIG = toml.load(CONFIG_PATH)
     PORT = CONFIG["deployment"]["dest"]
+    ECU_CONFIGS = json.load(open("ecu.json"))
 except FileNotFoundError:
     LOG.error(f"count not find file with path {CONFIG_PATH}")
     raise SystemExit
@@ -55,9 +57,13 @@ def get_dbcs():
 def parse_dbc():
     url = list(request.forms.keys())[0]
     dbc_raw = requests.get(url).text
-    dbc = parse(dbc_raw)
+    dbc, ecu = parse(dbc_raw, *ECU_CONFIGS.keys())
     response.content_type = "application/json"
-    return json.dumps(dbc.to_dict())
+    data = {
+        "dbc": dbc.to_dict(),
+        "ecu": ecu
+    }
+    return json.dumps(data)
 
 
 @app.get("/static/<path>/<filename>")
@@ -69,8 +75,8 @@ def static(path, filename):
 def upload():
     for thing in request.forms:
         data = json.loads(thing)
-        dbc = DBC.from_packets_list(data["file"][0]["packet"])
-        return(str(dbc))
+        dbc = DBC.from_packets_list(data["dbc"]["file"][0]["packet"], ECU_CONFIGS[data["ecu"]])
+        return str(dbc)
 
 
 run(app, host="localhost", port=PORT, debug=True)

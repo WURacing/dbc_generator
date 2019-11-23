@@ -1,12 +1,21 @@
 let schema;
 let inputs = [];
+let ecus = [];
 
 window.onload = function() {
     fetch("/static/ui/schema.json")
     .then(response => response.json())
     .then(response => {
-        schema = response;
+        schema = response.dbc;
+        ecus = response.ecu;
         this.createFields(schema.file, "file", inputs, document.getElementById("fields"));
+        let ecuSelect = this.document.getElementById("select-ecu");
+        for(let ecu of ecus) {
+            let option = this.document.createElement("option");
+            option.text = ecu;
+            option.value = ecu;
+            ecuSelect.appendChild(option);
+        }
     });
 
     fetch("/dbcs")
@@ -33,6 +42,7 @@ function createFields(fieldList, key, inputList, parentContainer) {
     container.classList.add("container");
     container.id = key;
     let inputFields = [];
+    let hasDeleteButton = key == "file";
     for(let field of fieldList) {
         if(field.ref == undefined) {
             // create text input field
@@ -42,7 +52,6 @@ function createFields(fieldList, key, inputList, parentContainer) {
             container.appendChild(textField);
         } else {
             let button = document.createElement("button");
-            
             button.innerHTML = field.display;
             button.onclick = () => {
                 let subInputs = [];
@@ -50,15 +59,16 @@ function createFields(fieldList, key, inputList, parentContainer) {
                 inputFields.push(subInputs[0]);
             }
             container.appendChild(button);
+            if(!hasDeleteButton) {
+                addDeleteButton(container);
+                hasDeleteButton = true;
+            }
         }
     }
-    let deleteButton = document.createElement("button");
-    deleteButton.classList.add("delete");
-    deleteButton.innerHTML = "Delete";
-    deleteButton.onclick = () => {
-        container.remove();
+    if(!hasDeleteButton) {
+        addDeleteButton(container);
+        hasDeleteButton = true;
     }
-    container.appendChild(deleteButton);
     inputList.push(inputFields);
     parentContainer.appendChild(container);
 }
@@ -84,7 +94,12 @@ function textInput(id, placeholder, value = "") {
  * Sends data to the backend
  */
 function post() {
-    let data = extractData();
+    let selector = document.getElementById("select-ecu");
+    let ecu = selector.options[selector.selectedIndex].value;
+    let data = {
+        dbc: extractData(),
+        ecu: ecu
+    }
     fetch("upload", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -116,7 +131,7 @@ function importFields(data, key, parentContainer) {
         let container = document.createElement("div");
         container.classList.add("container");
         container.id = key;
-
+        let hasDeleteButton = key == "file";
         for(let field of schemaData) {
             if(field.ref == undefined) {
                 // create text input field
@@ -133,18 +148,30 @@ function importFields(data, key, parentContainer) {
                     subInputs.push(subInputs[0]);
                 }
                 container.appendChild(button);
+                if(!hasDeleteButton) {
+                    addDeleteButton(container);
+                    hasDeleteButton = true;
+                }
                 importFields(entry[field.ref], field.ref, container);
             }
         }
-        let deleteButton = document.createElement("button");
-        deleteButton.classList.add("delete");
-        deleteButton.innerHTML = "Delete";
-        deleteButton.onclick = () => {
-            container.remove();
+        if(!hasDeleteButton) {
+            addDeleteButton(container);
+            hasDeleteButton = true;
         }
-        container.appendChild(deleteButton);
+        // addDeleteButton(container);
         parentContainer.appendChild(container);
     }
+}
+
+function addDeleteButton(container) {
+    let deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete");
+    deleteButton.innerHTML = "Delete";
+    deleteButton.onclick = () => {
+        container.remove();
+    }
+    container.appendChild(deleteButton);
 }
 
 function extractData() {
@@ -185,5 +212,6 @@ async function loadSelectedFile() {
     let data = await response.json();
     let parentContainer = document.getElementById("fields");
     parentContainer.innerHTML = "";
-    importFields(data.file, "file", parentContainer);
+    importFields(data.dbc.file, "file", parentContainer);
+    document.getElementById("select-ecu").selectedIndex = ecus.indexOf(data.ecu) + 1;
 }
