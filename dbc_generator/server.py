@@ -70,7 +70,7 @@ def upload():
     for thing in request.forms:
         data = json.loads(thing)
         dbc = DBC.from_packets_list(data["file"][0]["packet"])
-        print(dbc)
+        return(str(dbc))
 
 
 run(app, host="localhost", port=PORT, debug=True)

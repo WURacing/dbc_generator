@@ -25,8 +25,9 @@ class Packet:
     @classmethod
     def from_dict(cls, data: dict):
         signals = []
-        for signal in data["signals"]:
-            signals.append(Signal.from_dict(signal))
+        if "signals" in data:
+            for signal in data["signals"]:
+                signals.append(Signal.from_dict(signal))
 
         return cls(
             name=data["name"],

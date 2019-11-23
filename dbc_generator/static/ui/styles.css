@@ -6,6 +6,11 @@ body {
     font-size: 12px;
     width: 100px;
 }
+
+#select-dbc {
+    margin-right: 5px;
+}
+
 .container {
     margin-top: 20px;
     border: 2px solid black;
@@ -16,20 +21,6 @@ body {
     margin-right: 10px;
 }
 
-button {
-    padding: 4px 6px;
-    border: 1px solid #555;
-    background: white;
-    border-radius: 5px;
-    transition: 0.3s;
-    outline: none;
-}
-
-button:hover {
-    background-color: #555;
-    color: white;
-}
-
 .container .container {
     border-color: gray;
     border-width: 1px;
@@ -38,4 +29,33 @@ button:hover {
 .container .container .container {
     border-color: gray;
     border-style: dashed;
+}
+
+button {
+    padding: 4px 6px;
+    border: 1px solid #555;
+    background: white;
+    border-radius: 5px;
+    transition: 0.3s;
+    outline: none;
+    margin-right: 10px;
+}
+
+button:hover {
+    background-color: #555;
+    color: white;
+}
+
+button.delete {
+    border-color: maroon;
+    color: maroon;
+}
+
+button.delete:hover {
+    color: white;
+    background: maroon;
+}
+
+.container + button.delete {
+    margin-top: 10px;
 }

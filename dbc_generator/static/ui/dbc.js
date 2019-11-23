@@ -6,8 +6,7 @@ window.onload = function() {
     .then(response => response.json())
     .then(response => {
         schema = response;
-        this.createFields(schema.file, inputs, document.getElementById("fields"));
-        
+        this.createFields(schema.file, "file", inputs, document.getElementById("fields"));
     });
 
     fetch("/dbcs")
@@ -21,8 +20,6 @@ window.onload = function() {
             select.appendChild(option);
         }
     });
-    // let fields = document.getElementById("fields");
-    // console.log(getDataFromContainer(fields));
 }
 
 /**
@@ -31,9 +28,10 @@ window.onload = function() {
  * @param {HTMLInputElement[]} inputList 
  * @param {HTMLDivElement} parentContainer 
  */
-function createFields(fieldList, inputList, parentContainer) {
+function createFields(fieldList, key, inputList, parentContainer) {
     let container = document.createElement("div");
     container.classList.add("container");
+    container.id = key;
     let inputFields = [];
     for(let field of fieldList) {
         if(field.ref == undefined) {
@@ -44,15 +42,23 @@ function createFields(fieldList, inputList, parentContainer) {
             container.appendChild(textField);
         } else {
             let button = document.createElement("button");
+            
             button.innerHTML = field.display;
             button.onclick = () => {
                 let subInputs = [];
-                createFields(schema[field.ref], subInputs, container);
+                createFields(schema[field.ref], field.ref, subInputs, container);
                 inputFields.push(subInputs[0]);
             }
             container.appendChild(button);
         }
     }
+    let deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete");
+    deleteButton.innerHTML = "Delete";
+    deleteButton.onclick = () => {
+        container.remove();
+    }
+    container.appendChild(deleteButton);
     inputList.push(inputFields);
     parentContainer.appendChild(container);
 }
@@ -78,29 +84,23 @@ function textInput(id, placeholder, value = "") {
  * Sends data to the backend
  */
 function post() {
-    // let data = {file: []};
-    // for(let packet of inputs[0]) {
-    //     let packetData = {signals: []};
-    //     for(let value of packet) {
-    //         if(value instanceof Array) {
-    //             let signalData = {};
-    //             for(let j = 0; j < schema.signals.length; j++) {
-    //                 signalData[schema.signals[j].name] = value[j].value;
-    //             }
-    //             packetData.signals.push(signalData);
-    //         } else {
-    //             packetData[value.name] = value.value;
-    //         }
-    //     }
-    //     data.file.push(packetData);
-    // }
     let data = extractData();
-
     fetch("upload", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(data)
-    }).then(response => response.text()).then(console.log);
+    }).then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        // the filename you want
+        a.download = "file.dbc";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    });
 }
 
 /**
@@ -129,21 +129,27 @@ function importFields(data, key, parentContainer) {
                 button.innerHTML = field.display;
                 button.onclick = () => {
                     let subInputs = [];
-                    createFields(schema[field.ref], subInputs, container);
-                    inputFields.push(subInputs[0]);
+                    createFields(schema[field.ref], field.ref, subInputs, container);
+                    subInputs.push(subInputs[0]);
                 }
                 container.appendChild(button);
-
                 importFields(entry[field.ref], field.ref, container);
             }
         }
+        let deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete");
+        deleteButton.innerHTML = "Delete";
+        deleteButton.onclick = () => {
+            container.remove();
+        }
+        container.appendChild(deleteButton);
         parentContainer.appendChild(container);
     }
 }
 
 function extractData() {
     let fields = document.getElementById("fields");
-    return getDataFromContainer(fields)[""][0];
+    return getDataFromContainer(fields);
 }
 
 function getDataFromContainer(container) {
@@ -177,10 +183,7 @@ async function loadSelectedFile() {
         body: url
     });
     let data = await response.json();
-    let container = document.createElement("div");
-    container.classList.add("container");
-    importFields(data.file, "file", container);
     let parentContainer = document.getElementById("fields");
     parentContainer.innerHTML = "";
-    parentContainer.appendChild(container);
+    importFields(data.file, "file", parentContainer);
 }
