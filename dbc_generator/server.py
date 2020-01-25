@@ -18,7 +18,7 @@ try:
     PORT = CONFIG["deployment"]["dest"]
     ECU_CONFIGS = json.load(open("ecu.json"))
 except FileNotFoundError:
-    LOG.error(f"count not find file with path {CONFIG_PATH}")
+    LOG.error(f"could not find file with path {CONFIG_PATH}")
     raise SystemExit
 
 if PORT is None or CONFIG is None:
@@ -73,10 +73,10 @@ def static(path, filename):
 
 @app.post("/upload")
 def upload():
-    for thing in request.forms:
-        data = json.loads(thing)
-        dbc = DBC.from_packets_list(data["dbc"]["file"][0]["packet"], ECU_CONFIGS[data["ecu"]])
-        return str(dbc)
+    text = list(request.forms.keys())[0]
+    data = json.loads(text)
+    dbc = DBC.from_packets_list(data["dbc"]["file"][0]["packet"], ECU_CONFIGS[data["ecu"]])
+    return str(dbc)
 
 
 run(app, host="localhost", port=PORT, debug=True)
