@@ -1,0 +1,75 @@
+{
+    "dbc": {
+        "file": [
+            {
+                "name": "packet",
+                "ref": "packet",
+                "display": "Add Packet"
+            }
+        ],
+        "packet": [
+            {
+                "name": "id",
+                "display": "ID"
+            },
+            {
+                "name": "name",
+                "display": "Name"
+            },
+            {
+                "name": "length",
+                "display": "Length",
+                "default": 8
+            },
+            {
+                "name": "bus_id",
+                "display": "Bus ID"
+            },
+            {
+                "name": "signals",
+                "ref": "signals",
+                "display": "Add Signal"
+            }
+        ],
+        "signals": [
+            {
+                "name": "name",
+                "display": "Name"
+            },
+            {
+                "name": "pos_start",
+                "display": "Start Position"
+            },
+            {
+                "name": "pos_end",
+                "display": "Length"
+            },
+            {
+                "name": "scale",
+                "display": "Scale"
+            },
+            {
+                "name": "offset",
+                "display": "Offset"
+            },
+            {
+                "name": "min",
+                "display": "Minimum Value"
+            },
+            {
+                "name": "max",
+                "display": "Maximum Value"
+            },
+            {
+                "name": "units",
+                "display": "Units"
+            },
+            {
+                "name": "sender",
+                "display": "Sender",
+                "default": "Vector__XXX"
+            }
+        ]
+    },
+    "ecu": ["AEM", "PE"]
+}
